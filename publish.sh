@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
 
-sbt +clean +test +clientJS/publishSigned +clientJVM/publishSigned
+set -e
+
+sbt +clean +clientJVM/test +clientJS/publishSigned +clientJVM/publishSigned
 sbt sonatypeBundleRelease

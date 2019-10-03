@@ -1,22 +1,24 @@
 package spec
 
 import io.cour.client.CourioClient
+import io.youi.Unique
 import org.scalatest.Matchers
 import org.scalatest.wordspec.AsyncWordSpec
 import io.youi.net._
 
 class UserClientSpec extends AsyncWordSpec with Matchers {
   "User client" should {
-    lazy val client = new CourioClient("userClientSpec", url"http://localhost:8888/communication")
+    lazy val username = s"test-user-${Unique(length = 4).toLowerCase}"
+    lazy val client = new CourioClient(Unique(), url"http://localhost:8888/communication")
     "connect the client" in {
       client.connect().map { _ =>
         succeed
       }
     }
     "register a user" in {
-      client.comm.user.updateProfile("test-user", "Test User").map {
+      client.comm.user.updateProfile(username, "Test User").map {
         case Left(e) => fail(e.message)
-        case Right(p) => p.username should be("test-user")
+        case Right(p) => p.username should be(username)
       }
     }
     "set a password" in {
@@ -26,14 +28,14 @@ class UserClientSpec extends AsyncWordSpec with Matchers {
       }
     }
     "authenticate" in {
-      client.comm.user.logIn("test-user", "password").map {
+      client.comm.user.logIn(username, "password").map {
         case Left(e) => fail(e.message)
-        case Right(p) => p.username should be("test-user")
+        case Right(p) => p.username should be(username)
       }
     }
     "get profile" in {
       client.comm.user.profile().map { p =>
-        p.username should be("test-user")
+        p.username should be(username)
       }
     }
     "disconnect the client" in {
